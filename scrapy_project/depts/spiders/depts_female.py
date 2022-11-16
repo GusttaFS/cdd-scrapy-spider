@@ -14,7 +14,7 @@ class DeptsFemaleSpider(scrapy.Spider):
     def parse(self, response):
         data = dict()
         
-        data["nome"] = response.css('.informacoes-deputado li:nth-child(1)::text').get()[1:]
+        data["nome"] = response.css('.informacoes-deputado li:nth-child(1)::text').get()[1:].upper()
         data["genero"] = "F"
         data["data_nascimento"] = response.css('#identificacao li:nth-child(5)::text').get()[1:]
         data["presenca_plenario"] = response.css('.list-table__item:nth-child(1) .list-table__definition-description:nth-child(2)::text').get()[39:-40]
@@ -24,19 +24,27 @@ class DeptsFemaleSpider(scrapy.Spider):
         data["ausencia_comissao"] = response.css('.list-table__item+ .list-table__item .list-table__definition-description:nth-child(6)::text').get()[39:-44]
         data["ausencia_justificada_comissao"] = response.css('.list-table__item+ .list-table__item .list-table__definition-description:nth-child(4)::text').get()[39:-44]
 
-        data["gasto_total_par"] = response.css('.gasto__col:nth-child(1) tr:nth-child(1)  td:nth-child(2)::text').get()
+        gasto_total_par = response.css('.gasto__col:nth-child(1) tr:nth-child(1)  td:nth-child(2)::text').get()
+        gasto_total_par = gasto_total_par.replace(".","")
+        data["gasto_total_par"] = gasto_total_par.replace(",",".")
         #gasto_mes_par
         for x in response.css('#gastomensalcotaparlamentar > tbody > tr'):
             mes = x.css('td::text').get()
             valor = x.css('td:nth-child(2)::text').get()
+            valor = valor.replace(".","")
+            valor = valor.replace(",",".")
             key = "gasto_" + mes.lower() + "_par"
             data[key] = valor
         
-        data["gasto_total_gab"] = response.css('.gasto+ .gasto .gasto__col:nth-child(1) tr:nth-child(1)  td:nth-child(2)::text').get()
+        gasto_total_gab = response.css('.gasto+ .gasto .gasto__col:nth-child(1) tr:nth-child(1)  td:nth-child(2)::text').get()
+        gasto_total_gab = gasto_total_gab.replace(".","")
+        data["gasto_total_gab"] = gasto_total_gab.replace(",",".")
         #gasto_mes_gab
         for x in response.css('#gastomensalverbagabinete > tbody > tr'):
             mes = x.css('td::text').get()
             valor = x.css('td:nth-child(2)::text').get()
+            valor = valor.replace(".","")
+            valor = valor.replace(",",".")
             key = "gasto_" + mes.lower() + "_gab"
             data[key] = valor
 
